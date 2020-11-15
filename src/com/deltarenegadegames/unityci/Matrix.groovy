@@ -13,11 +13,7 @@ class Matrix {
             def axisValue = axis[i]
             def label = prefix + '-' + i
             tasks[axisValue] = {
-                stage(axisValue) {
-                    node(label) {
-                        body()
-                    }
-                }
+                body(axisValue, label)
             }
         }
 
