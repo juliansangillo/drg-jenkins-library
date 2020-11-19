@@ -5,7 +5,7 @@ def call(String labelPrefix, String[] axisValues, Closure execute) {
         def axisValue = axisValues[i]
         def label = labelPrefix + '-' + i
         tasks[axisValue] = {
-            stage(name) {
+            stage(axisValue) {
                 node(label) {
                     execute()
                 }
