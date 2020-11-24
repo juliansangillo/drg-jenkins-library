@@ -6,7 +6,7 @@ def call(String label, String[] axisList, Closure execute) {
         tasks[axisName] = {
             stage(axisName) {
                 node(label) {
-                    withEnv(["AXIS_NAME=${axisName}"]) {
+                    withEnv(env + [AXIS_NAME=axisName]) {
                         execute()
                     }
                 }
