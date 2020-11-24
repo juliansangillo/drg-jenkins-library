@@ -5,9 +5,12 @@ def call(String label, String[] axisList, Closure execute) {
         def axisName = axisList[i]
         tasks[axisName] = {
             node(label) {
-                withEnv(env + [AXIS_NAME=axisName]) {
-                    stage(axisName) {
+                stage(axisName) {
+                    steps {
                         execute()
+                    }
+                    environment {
+                        AXIS_NAME = axisName
                     }
                 }
             }
