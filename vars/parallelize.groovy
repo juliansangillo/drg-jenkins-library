@@ -1,9 +1,8 @@
-def call(String labelPrefix, String[] axisValues, Closure execute) {
+def call(String label, String[] axisValues, Closure execute) {
     
     def tasks = [:]
     for(int i = 0; i < axisValues.size(); i++) {
         def axisValue = axisValues[i]
-        def label = labelPrefix + '-' + i
         tasks[axisValue] = {
             stage(axisValue) {
                 node(label) {
