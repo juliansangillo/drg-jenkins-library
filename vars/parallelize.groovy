@@ -6,7 +6,9 @@ def call(String label, String[] axisList, Closure execute) {
         tasks[axisName] = {
             node(label) {
                 stage(axisName) {
-                    execute()
+                    steps {
+                        execute(AXIS_NAME:"${axisName}")
+                    }
                 }
             }
         }
