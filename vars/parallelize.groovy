@@ -4,9 +4,9 @@ def call(String label, String[] axisList, Closure execute) {
     for(int i = 0; i < axisList.size(); i++) {
         def axisName = axisList[i]
         tasks[axisName] = {
-            stage(axisName) {
-                node(label) {
-                    withEnv(env + [AXIS_NAME=axisName]) {
+            node(label) {
+                withEnv(env + [AXIS_NAME=axisName]) {
+                    stage(axisName) {
                         execute()
                     }
                 }
