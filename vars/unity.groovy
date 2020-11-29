@@ -1,5 +1,5 @@
 def init(String dockerImage) {
-    docker pull dockerImage
+    sh "docker pull ${dockerImage}"
 }
 
 def build(String localRepoPath, String dockerImage, String projectPath, String platform, String fileExtensions, String buildName, String version, boolean isDevelopmentBuild) {
