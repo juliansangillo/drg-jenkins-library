@@ -5,7 +5,7 @@ def init(String dockerImage) {
 def build(String localRepoPath, String dockerImage, String projectPath, String platform, String fileExtensions, String buildName, String version, String isDevelopmentBuild) {
     def extensions = [:]
     fileExtensions.split(' ').each {pair ->
-        def nameAndValue = pair.split('=')
+        def nameAndValue = pair.split(':')
         extensions[nameAndValue[0]] = nameAndValue[1]
     }
 
