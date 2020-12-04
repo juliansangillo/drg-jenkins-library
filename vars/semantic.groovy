@@ -14,7 +14,7 @@ def init(String prodBranch, String testBranch, String devBranch, String prodIsPr
     File releasercFile = new File('.releaserc')
     releasercFile.write releaserc
 
-    println releasercFile.text
+    echo releasercFile.text
 }
 
 def version(String githubToken) {
