@@ -25,6 +25,8 @@ def version(String githubToken) {
         script: 'semantic-release -d | grep -oP "Published release \\K.*? " | xargs',
         returnStdout: true
     )
+    
+    env.GITHUB_TOKEN = ''
 
     return version
 } 
