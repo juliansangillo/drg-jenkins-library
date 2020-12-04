@@ -14,6 +14,11 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
     if(extension) {
         fileExtensionArg = "-fileExtension ${extension}"
     }
+    
+    def versionArg = ""
+    if(version) {
+        versionArg = "-version ${version}"
+    }
 
     def developmentBuildFlag = ""
     if(isDevelopmentBuild == 'true') {
@@ -28,7 +33,7 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
     -platform ${platform} \
     ${fileExtensionArg} \
     -buildName "${buildName}" \
-    -version ${version} \
+    ${versionArg} \
     ${developmentBuildFlag}
     """
 }
