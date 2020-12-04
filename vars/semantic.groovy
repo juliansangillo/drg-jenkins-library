@@ -11,10 +11,9 @@ def init(String prodBranch, String testBranch, String devBranch, String prodIsPr
     releaserc = releaserc.replaceAll('%CHANGELOG_FILE_NAME%', changelogFileName)
     releaserc = releaserc.replaceAll('%CHANGELOG_TITLE%', changelogTitle)
     
-    File releasercFile = new File('.releaserc')
-    releasercFile.write releaserc
-
-    echo releasercFile.text
+    writeFile file: '.releaserc', text: releaserc
+    
+    sh 'cat .releaserc'
 }
 
 def version(String githubToken) {
