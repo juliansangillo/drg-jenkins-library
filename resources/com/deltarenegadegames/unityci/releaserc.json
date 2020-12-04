@@ -1,0 +1,45 @@
+{
+    "branch": [
+        {
+            "name": "%PROD_BRANCH%",
+            "prerelease": %PROD_IS_PRERELEASE%
+        },
+        {
+            "name": "%TEST_BRANCH%",
+            "prerelease": %TEST_IS_PRERELEASE%
+        },
+        {
+            "name": "%DEV_BRANCH%",
+            "prerelease": %DEV_IS_PRERELEASE%
+        }
+    ],
+    "plugins": [
+        "@semantic-release/commit-analyzer",
+        "@semantic-release/release-notes-generator",
+        [
+            "@semantic-release/changelog",
+            {
+                "changelogFile": "%CHANGELOG_FILE_NAME%",
+                "changelogTitle": "# %CHANGELOG_TITLE%"
+            }
+        ],
+        [
+            "@semantic-release/git",
+            {
+                "assets": [
+                    "%CHANGELOG_FILE_NAME%"
+                ]
+            }
+        ],
+        [
+            "@semantic-release/github",
+            {
+                "assets": [
+                    {
+                        "path": "bin/**",
+                    }
+                ]
+            }
+        ]
+    ]
+}
