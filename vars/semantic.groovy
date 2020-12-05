@@ -18,8 +18,10 @@ def init(String prodBranch, String testBranch, String devBranch, String prodIsPr
 
 def version(String githubCredentialsId) {
 
+    def version = ''
+
     withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
-        def version = sh (
+        version = sh (
             script: 'semantic-release -d | grep -oP "Published release \\K.*? " | xargs',
             returnStdout: true
         )
