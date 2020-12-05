@@ -39,8 +39,8 @@ def release(String githubCredentialsId) {
         if(status != 0) {
             def num = sh (
                 script: '''
-                    OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\K.*/" | tr -d '/');
-                    REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\K.*." | tr -d '.git');
+                    OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
+                    REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*." | tr -d '.git');
                 
                     RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION" 2> /dev/null | jq -r '.id');
                 
