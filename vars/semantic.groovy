@@ -18,7 +18,7 @@ def init(String prodBranch, String testBranch, String devBranch, String prodIsPr
 
 def version(String githubCredentialsId) {
 
-    withCredentials([usernamePassword(credentialsId: githubCredentialsId, passwordVariable: 'GITHUB_TOKEN')]) {
+    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
         def version = sh (
             script: 'semantic-release -d | grep -oP "Published release \\K.*? " | xargs',
             returnStdout: true
@@ -30,7 +30,7 @@ def version(String githubCredentialsId) {
 
 def release(String githubCredentialsId) {
 
-    withCredentials([usernamePassword(credentialsId: githubCredentialsId, passwordVariable: 'GITHUB_TOKEN')]) {
+    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
         def status = sh (
             script: 'semantic-release',
             returnStatus: true
