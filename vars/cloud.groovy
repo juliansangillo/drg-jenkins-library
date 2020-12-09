@@ -12,7 +12,7 @@ def cache(String url, String projectPath, String... objects) {
     
     objects.each{ obj ->
         sh (
-            script: "gsutil -m -q rsync -d -r \"${projectPath}/${obj}\" \"gs:${url}/${obj}/\""
+            script: "gsutil -m -q rsync -d -r \"${projectPath}/${obj}\" \"gs:${url}/${obj}/\"",
             label: 'Google Storage Upload'
         )
     }
@@ -32,7 +32,7 @@ def uncache(String url, String projectPath) {
    def objects = objectStr.split(' ')
    objects.each{ obj ->
        sh (
-           script: "gsutil -m -q cp -r \"${obj}\" \"${projectPath}\""
+           script: "gsutil -m -q cp -r \"${obj}\" \"${projectPath}\"",
            label: 'Google Storage Download'
        )
    }
