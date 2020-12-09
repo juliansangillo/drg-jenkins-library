@@ -27,7 +27,7 @@ def uncache(String url, String projectPath) {
        script: "gsutil ls -l 'gs:${url}/'",
        label: 'Google Storage List Objects',
        returnStdout: true
-   )
+   ).trim()
    
    def objects = objectStr.split(' ')
    objects.each{ obj ->
