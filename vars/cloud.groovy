@@ -6,17 +6,31 @@ def login(String cloudProject, String jenkinsCredentialsId) {
        )
    }
 }
+
+def cache(String url, String projectPath, String... objects) {
+    echo 'Pushing to cache ...'
+    
+    objects.each{ obj ->
+        sh (
+            script: "gsutil -m -q rsync -d -r \"${projectPath}/${obj}\" \"gs:${url}/${obj}/\""
+            label: 'Google Storage Upload'
+        )
+    }
+    
+    echo 'Cache pushed successfully'
+}
  
-def uncache(String cacheBucket, String jobName, String platform, String projectPath) {
+def uncache(String url, String projectPath) {
    echo 'Pulling from cache ...'
    
-   def objects = sh(
-       script: "gsutil ls -l 'gs://${cacheBucket}/${jobName}/${platform}/'",
-       label: "Google Storage List Objects BUCKET=${cacheBucket} JOB=${jobName} PLATFORM=${platform}",
+   def objectStr = sh(
+       script: "gsutil ls -l 'gs://${url}/'",
+       label: 'Google Storage List Objects',
        returnStdout: true
    )
    
-   objects.split(' ').each{ obj ->
+   def objects = objectStr.split(' ')
+   objects.each{ obj ->
        sh (
            script: "gsutil -m -q cp -r \"${obj}\" \"${projectPath}\""
            label: 'Google Storage Download'
