@@ -1,5 +1,8 @@
 def init(String dockerImage) {
-    sh "docker pull ${dockerImage}"
+    sh (
+        script: "docker pull ${dockerImage}",
+        label: 'Pull Unity docker image'
+    )
 }
 
 def build(String localRepoPath, String dockerImage, String projectPath, String platform, String fileExtensions, String buildName, String version, String isDevelopmentBuild) {
@@ -25,7 +28,8 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
         developmentBuildFlag = "-developmentBuild"
     }
 
-    sh """
+    sh (
+        script: """
     docker container run \
     --mount type=bind,source=${localRepoPath},target=/var/unity-home \
     ${dockerImage} \
@@ -35,5 +39,7 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
     -buildName "${buildName}" \
     ${versionArg} \
     ${developmentBuildFlag}
-    """
+    """,
+        label: 'Unity docker container build'
+    )
 }

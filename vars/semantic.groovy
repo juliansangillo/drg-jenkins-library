@@ -13,7 +13,10 @@ def init(String prodBranch, String testBranch, String devBranch, String prodIsPr
     
     writeFile file: '.releaserc', text: releaserc
     
-    sh 'cat .releaserc'
+    sh (
+        script: 'cat .releaserc',
+        label: 'Print .releaserc'
+    )
 }
 
 def version(String githubCredentialsId) {
@@ -23,6 +26,7 @@ def version(String githubCredentialsId) {
     withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
         version = sh (
             script: 'semantic-release -d | grep -oP "Published release \\K.*? " | xargs',
+            label: 'Get next version',
             returnStdout: true
         )
     }
@@ -52,9 +56,10 @@ def release(String githubCredentialsId) {
                     git tag -d v$VERSION;
                     git push origin :v$VERSION
                 ''',
+                label: 'Rollback semantic-release',
                 returnStatus: true
             )
-            error "Release failed with exit code: ${status}"
+            error "semantic-release failed with exit code: ${status}"
         }
     }
 
