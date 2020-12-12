@@ -39,6 +39,7 @@ def release(String githubCredentialsId) {
     withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
         def status = sh (
             script: 'semantic-release',
+            label: 'Release',
             returnStatus: true
         )
         
@@ -56,10 +57,10 @@ def release(String githubCredentialsId) {
                     git tag -d v$VERSION;
                     git push origin :v$VERSION
                 ''',
-                label: 'Rollback semantic-release',
+                label: 'Release rollback',
                 returnStatus: true
             )
-            error "semantic-release failed with exit code: ${status}"
+            error "Release failed with exit code: ${status}"
         }
     }
 
