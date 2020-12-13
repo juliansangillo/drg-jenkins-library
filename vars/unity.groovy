@@ -37,7 +37,8 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
     -platform ${platform} \
     ${fileExtensionArg} \
     -buildName "${buildName}" \
-    ${versionArg} ${developmentBuildFlag}
+    ${developmentBuildFlag} \
+    ${versionArg}
     """,
         label: 'Unity docker container build'
     )
