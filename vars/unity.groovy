@@ -25,7 +25,7 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
 
     def developmentBuildFlag = ""
     if(isDevelopmentBuild == 'true') {
-        developmentBuildFlag = "-developmentBuild"
+        developmentBuildFlag = '-developmentBuild';
     }
 
     sh (
@@ -37,8 +37,7 @@ def build(String localRepoPath, String dockerImage, String projectPath, String p
     -platform ${platform} \
     ${fileExtensionArg} \
     -buildName "${buildName}" \
-    ${versionArg} \
-    ${developmentBuildFlag}
+    ${versionArg} ${developmentBuildFlag}
     """,
         label: 'Unity docker container build'
     )
