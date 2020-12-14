@@ -46,13 +46,14 @@ def release(String githubCredentialsId) {
         if(status != 1) {
             def num = sh (
                 script: '''
-                    OWNER=juliansangillo;
+                    OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
                     REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*." | tr -d '.git');
                 
-                    RELEASE_JSON="$(curl -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION")";
-                    RELEASE_ID=$(echo "$RELEASE_JSON" | jq -r '.id')
+                    URL="https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION";
+                    RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" "$URL" | jq -r '.id');
                 
-                    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID";
+                    URL="https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID";
+                    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "$URL";
                 
                     git remote rm origin;
                     git remote add origin "git@github.com:$OWNER/$REPO.git";
