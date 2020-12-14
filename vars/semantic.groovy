@@ -43,16 +43,17 @@ def release(String githubCredentialsId) {
             returnStatus: true
         )
         
-        if(status != 0) {
+        if(status != 1) {
             def num = sh (
                 script: '''
                     OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
                     REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*." | tr -d '.git');
                 
-                    RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION" 2> /dev/null | jq -r '.id');
+                    RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION" | jq -r '.id');
                 
                     curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID";
                 
+                    git config user.name "$OWNER";
                     git config user.password "$GITHUB_TOKEN";
                     git tag -d v$VERSION;
                     git push origin :v$VERSION
