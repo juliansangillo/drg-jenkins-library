@@ -49,14 +49,12 @@ def release(String githubCredentialsId) {
                     OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
                     REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*." | tr -d '.git');
                 
-                    URL="https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION";
-                    RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" "$URL" | jq -r '.id');
+                    RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION" | jq -r '.id');
                 
-                    URL="https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID";
-                    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "$URL";
+                    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID";
                 
-                    git config user.name "$OWNER";
-                    git config user.password "$GITHUB_TOKEN";
+                    git config --global user.name "$OWNER";
+                    git config --global user.password "$GITHUB_TOKEN";
                     git tag -d v$VERSION;
                     git push origin :v$VERSION
                 ''',
