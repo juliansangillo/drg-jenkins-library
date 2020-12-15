@@ -53,18 +53,20 @@ def release(String githubCredentialsId) {
                 
                     curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID;
                 
+                    MESSAGE="$(git log -1 --pretty=%B | grep "chore(release): " | sed "s/chore(release): //g")";
+                
                     git remote rm origin;
                     git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
                     git checkout $BRANCH_NAME;
                     git tag -d v$VERSION;
                     git push origin :v$VERSION;
                     
-                    MESSAGE="$(git log -1 --pretty=%B | grep "chore(release): " | sed "s/chore(release): //g")";
-                    git config user.email "semantic-release-bot email address"
-                    git config user.name "semantic-release-bot"
+                    git config user.email "semantic-release-bot email address";
+                    git config user.name "semantic-release-bot";
+                    git pull --set-upstream origin $BRANCH_NAME;
                     git revert -n HEAD;
                     git commit -m "revert(release): $MESSAGE";
-                    git push origin $BRANCH_NAME
+                    git push
                 ''',
                 label: 'Release rollback',
                 returnStatus: true
