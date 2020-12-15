@@ -55,6 +55,7 @@ def release(String githubCredentialsId) {
                 
                     git remote rm origin;
                     git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
+                    git checkout $BRANCH_NAME;
                     git tag -d v$VERSION;
                     git push origin :v$VERSION;
                     
