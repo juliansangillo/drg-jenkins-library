@@ -56,7 +56,11 @@ def release(String githubCredentialsId) {
                     git remote rm origin;
                     git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
                     git tag -d v$VERSION;
-                    git push origin :v$VERSION
+                    git push origin :v$VERSION;
+                    
+                    MESSAGE="$(git log -1 --pretty=%B | grep "chore(release): " | sed "s/chore(release): //g")";
+                    git revert -e "revert(release): $MESSAGE" HEAD;
+                    git push
                 ''',
                 label: 'Release rollback',
                 returnStatus: true
