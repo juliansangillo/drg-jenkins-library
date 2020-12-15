@@ -59,6 +59,8 @@ def release(String githubCredentialsId) {
                     git push origin :v$VERSION;
                     
                     MESSAGE="$(git log -1 --pretty=%B | grep "chore(release): " | sed "s/chore(release): //g")";
+                    git config user.email "semantic-release-bot email address"
+                    git config user.name "semantic-release-bot"
                     git revert -n HEAD;
                     git commit -m "revert(release): $MESSAGE";
                     git push
