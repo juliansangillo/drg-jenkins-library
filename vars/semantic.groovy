@@ -64,7 +64,7 @@ def release(String githubCredentialsId) {
                     git config user.name "semantic-release-bot"
                     git revert -n HEAD;
                     git commit -m "revert(release): $MESSAGE";
-                    git push
+                    git push origin $BRANCH_NAME
                 ''',
                 label: 'Release rollback',
                 returnStatus: true
