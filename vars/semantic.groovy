@@ -53,8 +53,8 @@ def release(String githubCredentialsId) {
                 
                     curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID";
                 
-                    git config --global user.name "$OWNER";
-                    git config --global user.password "$GITHUB_TOKEN";
+                    git remote rm origin;
+                    git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
                     git tag -d v$VERSION;
                     git push origin :v$VERSION
                 ''',
