@@ -59,7 +59,8 @@ def release(String githubCredentialsId) {
                     git push origin :v$VERSION;
                     
                     MESSAGE="$(git log -1 --pretty=%B | grep "chore(release): " | sed "s/chore(release): //g")";
-                    git revert -e "revert(release): $MESSAGE" HEAD;
+                    git revert -n HEAD;
+                    git commit -m "revert(release): $MESSAGE";
                     git push
                 ''',
                 label: 'Release rollback',
