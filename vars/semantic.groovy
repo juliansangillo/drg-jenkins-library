@@ -61,8 +61,8 @@ def release(String githubCredentialsId) {
                     git tag -d v$VERSION;
                     git push origin :v$VERSION;
                     
-                    git config user.email "semantic-release-bot email address";
-                    git config user.name "semantic-release-bot";
+                    git config user.email "@semantic-release-bot email address";
+                    git config user.name "@semantic-release-bot";
                     git pull origin $BRANCH_NAME;
                     git revert -n HEAD;
                     git commit -m "revert(release): $MESSAGE";
