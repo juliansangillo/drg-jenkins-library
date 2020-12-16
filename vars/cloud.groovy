@@ -29,12 +29,14 @@ def uncache(String url, String projectPath) {
        returnStdout: true
    ).trim()
    
-   def objects = objectStr.split(' ')
-   objects.each{ obj ->
-       sh (
-           script: "gsutil -m -q cp -r \"${obj}\" \"${projectPath}\"",
-           label: 'Google Storage Download'
-       )
+   if(objectStr != '') {
+    def objects = objectStr.split(' ')
+    objects.each{ obj ->
+        sh (
+            script: "gsutil -m -q cp -r \"${obj}\" \"${projectPath}\"",
+            label: 'Google Storage Download'
+        )
+    }
    }
    
    echo 'Cache pulled successfully'
