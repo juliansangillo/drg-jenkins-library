@@ -24,7 +24,7 @@ def uncache(String url, String projectPath) {
    echo 'Pulling from cache ...'
    
    def objectStr = sh(
-       script: "gsutil ls -l 'gs:${url}/'",
+       script: "gsutil ls -l 'gs:${url}/' || exit 0",
        label: 'Google Storage List Objects',
        returnStdout: true
    ).trim()
