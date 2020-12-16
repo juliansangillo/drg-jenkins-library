@@ -23,7 +23,7 @@ def version(String githubCredentialsId) {
 
     def version = ''
 
-    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_ACCOUNT', passwordVariable: 'GITHUB_TOKEN')]) {
         version = sh (
             script: 'semantic-release -d | grep -oP "Published release \\K.*? " | xargs',
             label: 'Get next version',
@@ -36,7 +36,12 @@ def version(String githubCredentialsId) {
 
 def release(String githubCredentialsId) {
 
-    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
+    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_ACCOUNT', passwordVariable: 'GITHUB_TOKEN')]) {
+        env.GIT_AUTHOR_NAME = sh ( script: "git log -1 --pretty=format:'%an'", label: 'Get Author Name', returnStdout: true )
+        env.GIT_AUTHOR_EMAIL = sh ( script: "git log -1 --pretty=format:'%ae'", label: 'Get Author Email', returnStdout: true )
+        env.GIT_COMMITTER_NAME = sh ( script: "git log -1 --pretty=format:'%cn'", label: 'Get Committer Name', returnStdout: true )
+        env.GIT_COMMITTER_EMAIL = sh ( script: "git log -1 --pretty=format:'%ce'", label: 'Get Committer Email', returnStdout: true )
+    
         def status = sh (
             script: 'semantic-release',
             label: 'Release',
@@ -61,8 +66,8 @@ def release(String githubCredentialsId) {
                     git tag -d v$VERSION;
                     git push origin :v$VERSION;
                     
-                    git config user.email "@semantic-release-bot email address";
-                    git config user.name "@semantic-release-bot";
+                    git config user.email "$GIT_COMMITTER_EMAIL";
+                    git config user.name "$GIT_COMMITTER_NAME";
                     git pull origin $BRANCH_NAME;
                     git revert -n HEAD;
                     git commit -m "revert(release): $MESSAGE";
