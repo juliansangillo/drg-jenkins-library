@@ -48,7 +48,7 @@ def release(String githubCredentialsId) {
             returnStatus: true
         )
         
-        if(status != 1) {
+        if(status != 0) {
             def num = sh (
                 script: '''
                     OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
