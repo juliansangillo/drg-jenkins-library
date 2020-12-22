@@ -1,2 +1,2 @@
-# drg-jenkins-library
-A Jenkins shared library for use in Delta Renegade Games CI/CD pipelines
+# nbg-jenkins-library
+A Jenkins shared library for use in Naughty Biker Games CI/CD pipelines
