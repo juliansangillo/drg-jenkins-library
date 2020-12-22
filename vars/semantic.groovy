@@ -1,6 +1,6 @@
 def init(String prodBranch, String testBranch, String devBranch, String prodIsPrerelease, String testIsPrerelease, String devIsPrerelease, String changelogFileName, String changelogTitle) {
 
-    def releaserc = libraryResource('com/deltarenegadegames/unityci/releaserc.json')
+    def releaserc = libraryResource('com/naughtybikergames/unityci/releaserc.json')
     
     releaserc = releaserc.replaceAll('%PROD_BRANCH%', prodBranch)
     releaserc = releaserc.replaceAll('%TEST_BRANCH%', testBranch)
