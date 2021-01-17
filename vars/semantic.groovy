@@ -35,11 +35,6 @@ def version(String githubCredentialsId) {
 def release(String githubCredentialsId) {
 
     withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_ACCOUNT', passwordVariable: 'GITHUB_TOKEN')]) {
-        env.GIT_AUTHOR_NAME = sh ( script: "git log -1 --pretty=format:'%an'", label: 'Get Author Name', returnStdout: true )
-        env.GIT_AUTHOR_EMAIL = sh ( script: "git log -1 --pretty=format:'%ae'", label: 'Get Author Email', returnStdout: true )
-        env.GIT_COMMITTER_NAME = sh ( script: "git log -1 --pretty=format:'%cn'", label: 'Get Committer Name', returnStdout: true )
-        env.GIT_COMMITTER_EMAIL = sh ( script: "git log -1 --pretty=format:'%ce'", label: 'Get Committer Email', returnStdout: true )
-    
         def status = sh (
             script: 'semantic-release',
             label: 'Release',
