@@ -1,4 +1,4 @@
-def init(String prodBranch, String testBranch, String devBranch, String prodIsPrerelease, String testIsPrerelease, String devIsPrerelease, String changelogFileName, String changelogTitle) {
+def init(String prodBranch, String testBranch, String devBranch, String prodIsPrerelease, String testIsPrerelease, String devIsPrerelease) {
 
     def releaserc = libraryResource('io/naughtybikergames/unityci/releaserc.json')
     
@@ -8,8 +8,6 @@ def init(String prodBranch, String testBranch, String devBranch, String prodIsPr
     releaserc = releaserc.replaceAll('%PROD_IS_PRERELEASE%', prodIsPrerelease)
     releaserc = releaserc.replaceAll('%TEST_IS_PRERELEASE%', testIsPrerelease)
     releaserc = releaserc.replaceAll('%DEV_IS_PRERELEASE%', devIsPrerelease)
-    releaserc = releaserc.replaceAll('%CHANGELOG_FILE_NAME%', changelogFileName)
-    releaserc = releaserc.replaceAll('%CHANGELOG_TITLE%', changelogTitle)
     
     writeFile file: '.releaserc', text: releaserc
     
@@ -58,20 +56,11 @@ def release(String githubCredentialsId) {
                 
                     curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID;
                 
-                    MESSAGE="$(git log -1 --pretty=%B | grep "chore(release): " | sed "s/chore(release): //g")";
-                
                     git remote rm origin;
                     git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
                     git checkout $BRANCH_NAME;
                     git tag -d v$VERSION;
                     git push origin :v$VERSION;
-                    
-                    git config user.email "$GIT_COMMITTER_EMAIL";
-                    git config user.name "$GIT_COMMITTER_NAME";
-                    git pull origin $BRANCH_NAME;
-                    git revert -n HEAD;
-                    git commit -m "revert(release): $MESSAGE";
-                    git push origin $BRANCH_NAME
                 ''',
                 label: 'Release rollback',
                 returnStatus: true
