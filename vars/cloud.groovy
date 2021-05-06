@@ -7,6 +7,13 @@ def login(String cloudProject, String jenkinsCredentialsId) {
    }
 }
 
+def configureDocker() {
+    sh (
+        script: "gcloud auth configure-docker",
+        label: "Google Cloud Configure Docker"
+    )
+}
+
 def cache(String url, String projectPath, String... objects) {
     echo 'Pushing to cache ...'
     
