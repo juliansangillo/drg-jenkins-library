@@ -34,34 +34,44 @@ def version(String githubCredentialsId) {
 
 def release(String githubCredentialsId) {
 
+    def status = 0
+    
     withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_ACCOUNT', passwordVariable: 'GITHUB_TOKEN')]) {
-        def status = sh (
+        status = sh (
             script: 'semantic-release',
             label: 'Release',
             returnStatus: true
         )
-        
-        if(status != 0) {
-            def num = sh (
-                script: '''
-                    OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
-                    REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*." | tr -d '.git');
-                
-                    RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION | jq -r '.id');
-                
-                    curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID;
-                
-                    git remote rm origin;
-                    git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
-                    git checkout $BRANCH_NAME;
-                    git tag -d v$VERSION;
-                    git push origin :v$VERSION;
-                ''',
-                label: 'Release rollback',
-                returnStatus: true
-            )
-            error "Release failed with exit code: ${status}"
-        }
+    }
+    
+    if(status != 0) {
+        def num = rollback(githubCredentialsId)
+        error "Release failed with exit code: ${status}"
     }
 
+}
+
+def rollback(String githubCredentialsId) {
+    
+    withCredentials([usernamePassword(credentialsId: githubCredentialsId, usernameVariable: 'GITHUB_ACCOUNT', passwordVariable: 'GITHUB_TOKEN')]) {
+        return sh (
+            script: '''
+                OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
+                REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*." | tr -d '.git');
+            
+                RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION | jq -r '.id');
+            
+                curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/$RELEASE_ID;
+            
+                git remote rm origin;
+                git remote add origin https://$OWNER:$GITHUB_TOKEN@github.com/$OWNER/$REPO.git;
+                git checkout $BRANCH_NAME;
+                git tag -d v$VERSION;
+                git push origin :v$VERSION;
+            ''',
+            label: 'Release rollback',
+            returnStatus: true
+        )
+    }
+    
 }
