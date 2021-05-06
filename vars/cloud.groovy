@@ -48,4 +48,44 @@ def uncache(String url, String projectPath) {
    
    echo 'Cache pulled successfully'
 }
- 
+
+def deployToRun(String serviceName, String region, String imageName, String version,
+        String env, String port, String serviceAccount, String memory,
+        String cpu, String timeout, String maximumRequests, String maxInstances,
+        String dbInstance = "", String vpcConnector = "", String vpcEgress = "") {
+    echo 'Deploying to google cloud run ...'
+    
+    def db_config = ""
+    if(dbInstance != "") {
+        db_config = "--set-cloudsql-instances=${dbInstance}"
+    }
+    
+    def vpc_connector = ""
+    def vpc_egress = ""
+    if(vpcConnector != "") {
+        vpc_connector = "--vpc-connector=${vpcConnector}"
+        if(vpcEgress != "") {
+            vpc_egress = "--vpc-egress=${vpcEgress}"
+        }
+    }
+    
+    sh (
+        script: """
+            gcloud run deploy ${serviceName} --platform=managed \
+                --region=${region} \
+                --image=${imageName}:${version} \
+                --update-env-vars=ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0 \
+                --port=${port} \
+                --service-account={serviceAccount} \
+                --memory=${memory} \
+                --cpu=${cpu} \
+                --timeout=${timeout} \
+                --concurrency=${maximumRequests} \
+                --max-instances=${maxInstances} \
+                ${db_config} \
+                ${vpc_connector} \
+                ${vpc_egress}
+        """,
+        returnStatus: true
+    )
+}
