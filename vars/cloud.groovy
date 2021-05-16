@@ -55,6 +55,15 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         String dbInstance = "", String vpcConnector = "", String vpcEgress = "") {
     echo 'Deploying to google cloud run ...'
     
+    def envVars = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
+    def secretNames = sh (script: "gcloud secrets list --filter='labels.env_var:true labels:${env.toLowerCase()}' --format='(name:sort=1:label=)'", returnStdout: true).split('\n')
+    for(secretName in secretNames) {
+        def varName = secretName.substring(0, secretName.lastIndexOf('-')).replaceAll('__', ':')
+        def varValue = sh (script: "gcloud secrets versions access latest --secret=${secretName}", returnStdout: true)
+        
+        env_vars += ",${varName}=${varValue}"
+    }
+    
     def db_config = ""
     if(dbInstance != "") {
         db_config = "--set-cloudsql-instances=${dbInstance}"
@@ -74,7 +83,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
             gcloud run deploy ${serviceName} --platform=managed \
                 --region=${region} \
                 --image=${imageName}:${version} \
-                --update-env-vars=ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0 \
+                --set-env-vars=${envVars} \
                 --port=${port} \
                 --service-account={serviceAccount} \
                 --memory=${memory} \
