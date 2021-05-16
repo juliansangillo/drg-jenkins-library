@@ -1,5 +1,5 @@
 {
-    "branch": [
+    "branches": [
         {
             "name": "%PROD_BRANCH%",
             "prerelease": %PROD_IS_PRERELEASE%
