@@ -1,6 +1,11 @@
-def init(String prodBranch, String testBranch, String devBranch, String prodIsPrerelease, String testIsPrerelease, String devIsPrerelease) {
+def init(String prodBranch, String testBranch, String devBranch, String prodIsPrerelease, String testIsPrerelease, String devIsPrerelease, String profile = "") {
 
-    def releaserc = libraryResource('io/naughtybikergames/unityci/releaserc.json')
+    def path = 'io/naughtybikergames/unityci/releaserc.json'
+    if(profile != "") {
+        path = "io/naughtybikergames/unityci/${profile}.releaserc.json"
+    }
+
+    def releaserc = libraryResource(path)
     
     releaserc = releaserc.replaceAll('%PROD_BRANCH%', prodBranch)
     releaserc = releaserc.replaceAll('%TEST_BRANCH%', testBranch)
