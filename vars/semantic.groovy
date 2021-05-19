@@ -62,7 +62,7 @@ def rollback(String githubCredentialsId) {
         return sh (
             script: '''
                 OWNER=$(cat .git/config | grep "url" | grep -oP "https://github.com/\\K.*/" | tr -d '/');
-                REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*" | | sed 's/.git//g');
+                REPO=$(cat .git/config | grep "url" | grep -oP "https://github.com/.*/\\K.*" | sed 's/.git//g');
             
                 RELEASE_ID=$(curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/$OWNER/$REPO/releases/tags/v$VERSION | jq -r '.id');
             
