@@ -85,7 +85,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
                 --image=${imageName}:${version} \
                 --set-env-vars=${envVars} \
                 --port=${port} \
-                --service-account={serviceAccount} \
+                --service-account=${serviceAccount} \
                 --memory=${memory} \
                 --cpu=${cpu} \
                 --timeout=${timeout} \
