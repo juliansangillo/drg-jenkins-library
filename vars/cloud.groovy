@@ -61,7 +61,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         def varName = secretName.substring(0, secretName.lastIndexOf('-')).replaceAll('__', ':')
         def varValue = sh (script: "gcloud secrets versions access latest --secret=${secretName}", returnStdout: true)
         
-        env_vars += ",${varName}=${varValue}"
+        envVars += ",${varName}=${varValue}"
     }
     
     def db_config = ""
