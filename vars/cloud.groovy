@@ -65,15 +65,15 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     }
     
     def db_config = ""
-    if(dbInstance != "") {
+    if(dbInstance) {
         db_config = "--set-cloudsql-instances=${dbInstance}"
     }
     
     def vpc_connector = ""
     def vpc_egress = ""
-    if(vpcConnector != "") {
+    if(vpcConnector) {
         vpc_connector = "--vpc-connector=${vpcConnector}"
-        if(vpcEgress != "") {
+        if(vpcEgress) {
             vpc_egress = "--vpc-egress=${vpcEgress}"
         }
     }
