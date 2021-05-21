@@ -79,7 +79,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     }
     
     sh (
-        script: "gcloud run deploy ${serviceName} --quiet --platform=managed --region=${region} --image=${imageName}:${version} --set-env-vars=${envVars} --port=${port} --service-account=${serviceAccount} --memory=${memory} --cpu=${cpu} --timeout=${timeout} --concurrency=${maximumRequests} --max-instances=${maxInstances} ${db_config} ${vpc_connector} ${vpc_egress}",
+        script: "gcloud run deploy ${serviceName} --quiet --platform=managed --region=${region} --set-env-vars=${envVars} --port=${port} --service-account=${serviceAccount} --memory=${memory} --cpu=${cpu} --timeout=${timeout} --concurrency=${maximumRequests} --max-instances=${maxInstances} ${db_config} ${vpc_connector} ${vpc_egress} --image=${imageName}:${version}",
         label: 'Google cloud run deploy'
     )
 }
