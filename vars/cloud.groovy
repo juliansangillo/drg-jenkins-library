@@ -81,25 +81,25 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     }
     
     wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [[regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |\$)"]]]) {
-        withEnv(["ENV_VARS=${envVars}"]) {
+        withEnv(["SERVICE_NAME=${serviceName}", "REGION=${region}", "ENV_VARS=${envVars}", "PORT=${port}", "SERVICE_ACCOUNT=${serviceAccount}", "MEMORY=${memory}", "CPU=${cpu}", "TIMEOUT=${timeout}", "MAX_REQUESTS=${maximumRequests}", "MAX_INSTANCES=${maxInstances}", "DB_CONFIG=${db_config}", "VPC_CONNECTOR=${vpc_connector}", "VPC_EGRESS=${vpc_egress}", "IMAGE_NAME=${imageName}", "VERSION=${version}"]) {
             sh (
-                script: """
-                gcloud run deploy ${serviceName} \
+                script: '''
+                gcloud run deploy $SERVICE_NAME \
                     --platform=managed \
-                    --region=${region} \
+                    --region=$REGION \
                     --set-env-vars=$ENV_VARS \
-                    --port=${port} \
-                    --service-account=${serviceAccount} \
-                    --memory=${memory} \
-                    --cpu=${cpu} \
-                    --timeout=${timeout} \
-                    --concurrency=${maximumRequests} \
-                    --max-instances=${maxInstances} \
-                    ${db_config} \
-                    ${vpc_connector} \
-                    ${vpc_egress} \
-                    --image=${imageName}:${version}
-                """,
+                    --port=$PORT \
+                    --service-account=$SERVICE_ACCOUNT \
+                    --memory=$MEMORY \
+                    --cpu=$CPU \
+                    --timeout=$TIMEOUT \
+                    --concurrency=$MAX_REQUESTS \
+                    --max-instances=$MAX_INSTANCES \
+                    $DB_CONFIG \
+                    $VPC_CONNECTOR \
+                    $VPC_EGRESS \
+                    --image=$IMAGE_NAME:$VERSION
+                ''',
                 label: 'Google cloud run deploy'
             )
         }
