@@ -80,7 +80,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         }
     }
     
-    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [[regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |$)"]]]) {
+    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [[regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |\$)"]]]) {
         sh (
             script: """
             gcloud run deploy ${serviceName} \
