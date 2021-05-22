@@ -56,14 +56,14 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     echo 'Deploying to google cloud run ...'
     
     def envVars = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
-    def secretRegex = []
+    //def secretRegex = []
     def secretNames = sh (script: "gcloud secrets list --filter='labels.env_var:true labels:${env.toLowerCase()}' --format='(name:sort=1:label=)'", returnStdout: true).split('\n')
     for(secretName in secretNames) {
         def formattedSecretName = secretName.substring(0, secretName.lastIndexOf('-')).replaceAll('__', ':')
         def secret = sh (script: "gcloud secrets versions access latest --secret=${secretName}", returnStdout: true)
         
         envVars += ",${formattedSecretName}=${secret}"
-        secretRegex += "/(?<=CloudinarySettings:ApiKey=).+?(?=,|\$)/gm"
+        //secretRegex += "/(?<=CloudinarySettings:ApiKey=).+?(?=,|\$)/gm"
     }
     
     def db_config = ""
@@ -80,7 +80,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         }
     }
     
-    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: secretRegex]) {
+    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: ["/(?<=CloudinarySettings:ApiKey=).+?(?=,|\$)/gm"]]) {
         sh (
             script: """
             gcloud run deploy ${serviceName} \
