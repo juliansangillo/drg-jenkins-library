@@ -83,6 +83,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [[regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |\$)"]]]) {
         sh (
             script: """
+            ;
             gcloud run deploy ${serviceName} \
                 --platform=managed \
                 --region=${region} \
@@ -97,7 +98,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
                 ${db_config} \
                 ${vpc_connector} \
                 ${vpc_egress} \
-                --image=${imageName}:${version}
+                --image=${imageName}:${version};
             """,
             label: 'Google cloud run deploy'
         )
