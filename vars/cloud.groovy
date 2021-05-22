@@ -56,14 +56,15 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     echo 'Deploying to google cloud run ...'
     
     def envVars = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
-    //def secretRegex = []
+    def secretRegex = []
     def secretNames = sh (script: "gcloud secrets list --filter='labels.env_var:true labels:${env.toLowerCase()}' --format='(name:sort=1:label=)'", returnStdout: true).split('\n')
     for(secretName in secretNames) {
         def formattedSecretName = secretName.substring(0, secretName.lastIndexOf('-')).replaceAll('__', ':')
         def secret = sh (script: "gcloud secrets versions access latest --secret=${secretName}", returnStdout: true)
         
         envVars += ",${formattedSecretName}=${secret}"
-        //secretRegex += "/(?<=CloudinarySettings:ApiKey=).+?(?=,|\$)/gm"
+        //secretRegex += regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |\$)"
+        secretRegex += regex: "(?<=${formattedSecretName}=).+?(?=,| |\$)"
     }
     
     def db_config = ""
@@ -80,7 +81,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         }
     }
     
-    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [[regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |\$)"]]]) {
+    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [secretRegex]]) {
         withEnv(["SERVICE_NAME=${serviceName}", "REGION=${region}", "ENV_VARS=${envVars}", "PORT=${port}", "SERVICE_ACCOUNT=${serviceAccount}", "MEMORY=${memory}", "CPU=${cpu}", "TIMEOUT=${timeout}", "MAX_REQUESTS=${maximumRequests}", "MAX_INSTANCES=${maxInstances}", "DB_CONFIG=${db_config}", "VPC_CONNECTOR=${vpc_connector}", "VPC_EGRESS=${vpc_egress}", "IMAGE_NAME=${imageName}", "VERSION=${version}"]) {
             sh (
                 script: '''
