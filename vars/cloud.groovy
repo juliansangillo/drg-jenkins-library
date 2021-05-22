@@ -55,16 +55,14 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         String dbInstance = "", String vpcConnector = "", String vpcEgress = "") {
     echo 'Deploying to google cloud run ...'
     
-    //def envVars = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
-    env.ENV_VARS = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
+    def envVars = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
     //def secretRegex = []
     def secretNames = sh (script: "gcloud secrets list --filter='labels.env_var:true labels:${env.toLowerCase()}' --format='(name:sort=1:label=)'", returnStdout: true).split('\n')
     for(secretName in secretNames) {
         def formattedSecretName = secretName.substring(0, secretName.lastIndexOf('-')).replaceAll('__', ':')
         def secret = sh (script: "gcloud secrets versions access latest --secret=${secretName}", returnStdout: true)
         
-        //envVars += ",${formattedSecretName}=${secret}"
-        env.ENV_VARS += ",${formattedSecretName}=${secret}"
+        envVars += ",${formattedSecretName}=${secret}"
         //secretRegex += "/(?<=CloudinarySettings:ApiKey=).+?(?=,|\$)/gm"
     }
     
@@ -83,25 +81,27 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     }
     
     wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [[regex: "(?<=CloudinarySettings:ApiKey=).+?(?=,| |\$)"]]]) {
-        sh (
-            script: """
-            gcloud run deploy ${serviceName} \
-                --platform=managed \
-                --region=${region} \
-                --set-env-vars=$ENV_VARS \
-                --port=${port} \
-                --service-account=${serviceAccount} \
-                --memory=${memory} \
-                --cpu=${cpu} \
-                --timeout=${timeout} \
-                --concurrency=${maximumRequests} \
-                --max-instances=${maxInstances} \
-                ${db_config} \
-                ${vpc_connector} \
-                ${vpc_egress} \
-                --image=${imageName}:${version}
-            """,
-            label: 'Google cloud run deploy'
-        )
+        withEnv(["ENV_VARS=${envVars}"]) {
+            sh (
+                script: """
+                gcloud run deploy ${serviceName} \
+                    --platform=managed \
+                    --region=${region} \
+                    --set-env-vars=$ENV_VARS \
+                    --port=${port} \
+                    --service-account=${serviceAccount} \
+                    --memory=${memory} \
+                    --cpu=${cpu} \
+                    --timeout=${timeout} \
+                    --concurrency=${maximumRequests} \
+                    --max-instances=${maxInstances} \
+                    ${db_config} \
+                    ${vpc_connector} \
+                    ${vpc_egress} \
+                    --image=${imageName}:${version}
+                """,
+                label: 'Google cloud run deploy'
+            )
+        }
     }
 }
