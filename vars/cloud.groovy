@@ -63,7 +63,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         def secret = sh (script: "gcloud secrets versions access latest --secret=${secretName}", returnStdout: true)
         
         envVars += ",${formattedSecretName}=${secret}"
-        secretRegex += "/(?<=CloudinarySettings:ApiKey=).+?(?=,|$)/gm"
+        secretRegex += "/(?<=CloudinarySettings:ApiKey=).+?(?=,|\$)/gm"
     }
     
     def db_config = ""
