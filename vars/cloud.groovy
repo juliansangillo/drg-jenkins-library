@@ -80,8 +80,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         }
     }
     
-    //wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: [secretRegex]]) 
-    maskPasswords(varPasswordPairs: [], varMaskRegexes: secretRegex) {
+    wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: secretRegex]) {
         sh (
             script: """
             gcloud run deploy ${serviceName} \
