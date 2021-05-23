@@ -121,7 +121,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
             
             if(route) {
                 sh (
-                    script '''
+                    script: '''
                     gcloud beta run domain-mappings create \
                         --platform=managed \
                         --region=$REGION \
