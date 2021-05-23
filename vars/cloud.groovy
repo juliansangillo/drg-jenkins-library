@@ -53,7 +53,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         String env, String port, String serviceAccount, String memory,
         String cpu, String timeout, String maximumRequests, String maxInstances,
         String dbInstance = "", String vpcConnector = "", String vpcEgress = "", 
-        String allowUnauthenticated = "false") {
+        String allowUnauthenticated = "false", String route = "") {
     echo 'Deploying to google cloud run ...'
     
     def envVars = "ASPNETCORE_ENVIRONMENT=${env},HOST=0.0.0.0"
@@ -85,8 +85,16 @@ def deployToRun(String serviceName, String region, String imageName, String vers
     if(allowUnauthenticated == "true")
         allow_unauthenticated = "--allow-unauthenticated"
     
+    def no_traffic = ""
+    if(env == "Production" || env == "Testing")
+        no_traffic = "--no-traffic"
+        
+    def numRevisions = sh (script: "gcloud run revisions list --platform=managed --region=${region} --service=${serviceName} --format='(name:label=)' | wc -l", returnStdout: true)
+    def revisionId = sh (script: "printf '%05g\n' \$((${numRevisions} + 1))", returnStdout: true)
+    def tag = "rev${revisionId}"
+    
     wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [], varMaskRegexes: secretRegex]) {
-        withEnv(["SERVICE_NAME=${serviceName}", "REGION=${region}", "ENV_VARS=${envVars}", "PORT=${port}", "SERVICE_ACCOUNT=${serviceAccount}", "MEMORY=${memory}", "CPU=${cpu}", "TIMEOUT=${timeout}", "MAX_REQUESTS=${maximumRequests}", "MAX_INSTANCES=${maxInstances}", "DB_CONFIG=${db_config}", "VPC_CONNECTOR=${vpc_connector}", "VPC_EGRESS=${vpc_egress}", "ALLOW_UNAUTHENTICATED=${allow_unauthenticated}", "IMAGE_NAME=${imageName}", "VERSION=${version}"]) {
+        withEnv(["SERVICE_NAME=${serviceName}", "REGION=${region}", "ENV_VARS=${envVars}", "PORT=${port}", "SERVICE_ACCOUNT=${serviceAccount}", "MEMORY=${memory}", "CPU=${cpu}", "TIMEOUT=${timeout}", "MAX_REQUESTS=${maximumRequests}", "MAX_INSTANCES=${maxInstances}", "DB_CONFIG=${db_config}", "VPC_CONNECTOR=${vpc_connector}", "VPC_EGRESS=${vpc_egress}", "ALLOW_UNAUTHENTICATED=${allow_unauthenticated}", "NO_TRAFFIC=${no_traffic}", "TAG=${tag}", "IMAGE_NAME=${imageName}", "VERSION=${version}", "ROUTE=${route}"]) {
             sh (
                 script: '''
                 gcloud run deploy $SERVICE_NAME \
@@ -104,10 +112,27 @@ def deployToRun(String serviceName, String region, String imageName, String vers
                     $VPC_CONNECTOR \
                     $VPC_EGRESS \
                     $ALLOW_UNAUTHENTICATED \
+                    $NO_TRAFFIC \
+                    --tag=$TAG \
                     --image=$IMAGE_NAME:$VERSION
                 ''',
                 label: 'Google cloud run deploy'
             )
+            
+            if(route) {
+                sh (
+                    script '''
+                    gcloud beta run domain-mappings create \
+                        --platform=managed \
+                        --region=$REGION \
+                        --service=$SERVICE_NAME \
+                        --domain=$ROUTE
+                        --force-override
+                    ''',
+                    label: 'Google cloud create domain mapping',
+                    returnStatus: true
+                )
+            }
         }
     }
 }
