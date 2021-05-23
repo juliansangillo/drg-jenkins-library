@@ -97,7 +97,7 @@ def deployToRun(String serviceName, String region, String imageName, String vers
         withEnv(["SERVICE_NAME=${serviceName}", "REGION=${region}", "ENV_VARS=${envVars}", "PORT=${port}", "SERVICE_ACCOUNT=${serviceAccount}", "MEMORY=${memory}", "CPU=${cpu}", "TIMEOUT=${timeout}", "MAX_REQUESTS=${maximumRequests}", "MAX_INSTANCES=${maxInstances}", "DB_CONFIG=${db_config}", "VPC_CONNECTOR=${vpc_connector}", "VPC_EGRESS=${vpc_egress}", "ALLOW_UNAUTHENTICATED=${allow_unauthenticated}", "NO_TRAFFIC=${no_traffic}", "TAG=${tag}", "IMAGE_NAME=${imageName}", "VERSION=${version}", "ROUTE=${route}"]) {
             sh (
                 script: '''
-                gcloud run deploy $SERVICE_NAME \
+                gcloud beta run deploy $SERVICE_NAME \
                     --platform=managed \
                     --region=$REGION \
                     --set-env-vars=$ENV_VARS \
